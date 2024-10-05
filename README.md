@@ -1,4 +1,4 @@
-# Laravel ToDo アプリケーション
+# Laravel ToDo アプリケーション の API
 
 ## 起動方法
 
@@ -6,13 +6,31 @@
 # env のコピー
 cp .env.example .env
 
-# docker-compose 経由で起動
+# docker-compose 経由で起動（以降はdockerデスクトップで起動可能）
 docker-compose up --build -d
 
-# その他のセットアップ
+# 初期セットアップ
 docker-compose exec laravel.test php key:generate
 docker-compose exec laravel.test php artisan migrate
 ```
+
+## 環境構築でやったこと（今後実行する必要はない）
+
+1. `curl -s "https://laravel.build/{ディレクトリ名}" | bash` で、新しいディレクトリが作成される
+   そのディレクトリに移動し作業開始
+
+2. `docker-compose.yml`を書き換える
+
+    - `laravel.test`は、初期段階だと自身の端末に同じバージョンの`php`及び`composer`がないと動作しないため、`Dockerfile`を参照して起動できるように修正
+    - `mailpit`など、今回の要件に必要のないものを削除
+    - `mysql`の`image`を信用のあるものに変更
+
+3. Laravel を API モードに設定
+    ```shell
+      docker-compose exec laravel.test bash # コンテナ内に入れうt
+      composer require laravel/breeze --dev
+      php artisan breeze:install api
+    ```
 
 ---
 
@@ -82,3 +100,7 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+```
+
+```
