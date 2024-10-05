@@ -1,5 +1,7 @@
 # Laravel ToDo アプリケーション の API
 
+<!-- 9:38-11:21 1h43min -->
+
 ## 起動方法
 
 ```shell
@@ -9,9 +11,16 @@ cp .env.example .env
 # docker-compose 経由で起動（以降はdockerデスクトップで起動可能）
 docker-compose up --build -d
 
-# 初期セットアップ
-docker-compose exec laravel.test php key:generate
-docker-compose exec laravel.test php artisan migrate
+# 初期セットアップ（laravel.testコンテナ内で）
+php key:generate
+php artisan migrate
+```
+
+### テストコードの実行
+
+```shell
+# laravel.testコンテナ内で
+php artisan test tests/Feature/TaskApiTest.php
 ```
 
 ## 環境構築でやったこと（今後実行する必要はない）
