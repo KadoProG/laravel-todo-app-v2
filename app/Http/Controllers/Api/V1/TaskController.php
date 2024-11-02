@@ -15,6 +15,7 @@ class TaskController extends Controller
     public function index(): JsonResource
     {
         $tasks = Task::all();
+
         return TaskResource::collection($tasks);
     }
 
@@ -33,6 +34,7 @@ class TaskController extends Controller
         ]);
 
         $task = Task::create($validated);
+
         return new TaskResource($task);
     }
 
@@ -48,6 +50,7 @@ class TaskController extends Controller
         $validated['is_done'] = $validated['isDone'] ?? $task->is_done;
 
         $task->update($validated);
+
         return new TaskResource($task); // 更新されたタスクをTaskResourceで返す
     }
 
@@ -55,6 +58,7 @@ class TaskController extends Controller
     public function destroy(Task $task): JsonResponse
     {
         $task->delete();
+
         return response()->json(null, 204);
     }
 }
