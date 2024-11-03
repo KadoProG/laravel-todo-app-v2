@@ -1,0 +1,12 @@
+{
+    "name": "todo-laravel",
+    "version": "1.0.0",
+    "license": "MIT",
+    "scripts": {
+        "lint": "docker-compose exec laravel.test ./vendor/bin/pint",
+        "prepare": "husky"
+    },
+    "devDependencies": {
+        "husky": "^9.1.6"
+    }
+}

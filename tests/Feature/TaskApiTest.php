@@ -12,7 +12,6 @@ class TaskApiTest extends TestCase
 {
     use RefreshDatabase; // データベースのリフレッシュ
 
-
     public function setup(): void
     {
         parent::setUp();
@@ -24,7 +23,7 @@ class TaskApiTest extends TestCase
         $token = JWTAuth::fromUser($user);
 
         $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ]);
     }
 

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -36,7 +36,7 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (!$token = JWTAuth::attempt($credentials)) {
+        if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -63,16 +63,17 @@ class AuthController extends Controller
             // トークンをリフレッシュ
             $token = JWTAuth::getToken();
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json(['error' => 'Token not provided'], 400);
             }
 
             $newToken = JWTAuth::refresh($token);
+
             return response()->json(['token' => $newToken]);
         } catch (JWTException $e) {
             return response()->json([
                 'error' => 'Could not refresh token',
-                'detail' => $e->getMessage()
+                'detail' => $e->getMessage(),
             ], 500);
         }
     }

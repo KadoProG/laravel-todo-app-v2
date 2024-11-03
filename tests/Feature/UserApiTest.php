@@ -4,11 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserApiTest extends TestCase
-
 {
     use RefreshDatabase; // データベースのリフレッシュ
 
@@ -22,7 +21,7 @@ class UserApiTest extends TestCase
 
         // トークンをAuthorizationヘッダーに設定してリクエスト
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->json('GET', '/api/v1/me');
 
         // レスポンスの検証
@@ -41,14 +40,14 @@ class UserApiTest extends TestCase
 
         // トークンのリフレッシュ
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->post('/api/v1/refresh');
 
         $newToken = $response->json('token');
 
         // 新しいトークンで認証されたリクエストをテスト
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $newToken,
+            'Authorization' => 'Bearer '.$newToken,
         ])->json('GET', '/api/v1/me');
 
         $response->assertStatus(200);

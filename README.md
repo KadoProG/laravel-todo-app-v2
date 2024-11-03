@@ -14,6 +14,9 @@ docker-compose up --build -d
 # 初期セットアップ（laravel.testコンテナ内で）
 php key:generate
 php artisan migrate
+
+# コミット前にやること
+yarn # install package（huskyがインストールされる）
 ```
 
 ### テストコードの実行
