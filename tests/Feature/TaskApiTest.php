@@ -3,15 +3,32 @@
 namespace Tests\Feature;
 
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class TaskApiTest extends TestCase
 {
     use RefreshDatabase; // データベースのリフレッシュ
 
-    /** @test */
-    public function it_can_get_all_tasks()
+
+    public function setup(): void
+    {
+        parent::setUp();
+
+        // テストユーザーの作成
+        $user = User::factory()->create();
+
+        // JWTトークンを発行
+        $token = JWTAuth::fromUser($user);
+
+        $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ]);
+    }
+
+    public function test_can_get_all_tasks()
     {
         // テストデータの作成
         Task::factory()->count(3)->create();
@@ -24,8 +41,7 @@ class TaskApiTest extends TestCase
             ->assertJsonCount(3); // タスクが3つあるか確認
     }
 
-    /** @test */
-    public function it_can_get_a_single_task()
+    public function test_can_get_a_single_task()
     {
         // テストデータの作成
         $task = Task::factory()->create();
@@ -42,8 +58,7 @@ class TaskApiTest extends TestCase
             ]);
     }
 
-    /** @test */
-    public function it_can_create_a_task()
+    public function test_can_create_a_task()
     {
         // テスト用データ
         $data = [
@@ -69,8 +84,7 @@ class TaskApiTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_can_update_a_task()
+    public function test_can_update_a_task()
     {
         // テストデータの作成
         $task = Task::factory()->create([
@@ -102,8 +116,7 @@ class TaskApiTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_can_delete_a_task()
+    public function test_can_delete_a_task()
     {
         // テストデータの作成
         $task = Task::factory()->create();
@@ -120,12 +133,12 @@ class TaskApiTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_validates_title_field_when_creating_a_task()
+    public function test_validates_title_field_when_creating_a_task()
     {
         // 空のデータでAPIリクエスト
         $response = $this->postJson('/api/v1/tasks', [
             'title' => '', // 空のタイトル
+            'description' => 'This is a new task.',
             'isDone' => false,
         ]);
 
