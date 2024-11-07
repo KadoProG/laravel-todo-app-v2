@@ -18,6 +18,7 @@ class Task extends Model
         'title',
         'description',
         'is_done',
+        'parent_id',
     ];
 
     /**
@@ -25,7 +26,7 @@ class Task extends Model
      *
      * @var array<string>
      */
-    protected $appends = ['isDone'];
+    protected $appends = ['isDone', 'parentId'];
 
     /**
      * The attributes that should be cast.
@@ -34,6 +35,7 @@ class Task extends Model
      */
     protected $casts = [
         'is_done' => 'boolean',
+        'parent_id' => 'integer',
     ];
 
     /**
@@ -49,5 +51,23 @@ class Task extends Model
     public function setIsDoneAttribute($value)
     {
         $this->attributes['is_done'] = $value;
+    }
+
+    // parentIdの値を保存するときにparent_idカラムに変換するミューテータ
+    public function setParentIdAttribute($value)
+    {
+        $this->attributes['parent_id'] = $value;
+    }
+
+    // 子Taskを取得するリレーション
+    public function children()
+    {
+        return $this->hasMany(Task::class, 'parent_id');
+    }
+
+    // 親Taskを取得するリレーション
+    public function parent()
+    {
+        return $this->belongsTo(Task::class, 'parent_id');
     }
 }

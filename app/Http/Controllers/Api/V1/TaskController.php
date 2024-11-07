@@ -14,7 +14,7 @@ class TaskController extends Controller
     // GET /tasks - 全タスクの取得
     public function index(): JsonResource
     {
-        $tasks = Task::all();
+        $tasks = Task::with('children')->whereNull('parent_id')->get();
 
         return TaskResource::collection($tasks);
     }
@@ -22,6 +22,8 @@ class TaskController extends Controller
     // GET /tasks/{task} - 特定タスクの取得
     public function show(Task $task): JsonResource
     {
+        $task->load('children');
+
         return new TaskResource($task);
     }
 
@@ -31,7 +33,10 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'parentId' => 'sometimes|integer|exists:tasks,id',
         ]);
+
+        $validated['parent_id'] = $validated['parentId'] ?? null;
 
         $task = Task::create($validated);
 

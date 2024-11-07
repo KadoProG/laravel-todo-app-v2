@@ -19,6 +19,8 @@ class TaskResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'isDone' => $this->is_done,
+            'parentId' => $this->parent_id,
+            'children' => TaskResource::collection($this->whenLoaded('children')),
         ];
     }
 }
