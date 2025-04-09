@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TaskController extends Controller
 {
-    // GET /tasks - 全タスクの取得
+    /** タスク一覧取得 */
     public function index(): JsonResource
     {
         $tasks = Task::with('children')->whereNull('parent_id')->get();
@@ -19,7 +19,7 @@ class TaskController extends Controller
         return TaskResource::collection($tasks);
     }
 
-    // GET /tasks/{task} - 特定タスクの取得
+    /** タスク単体取得 */
     public function show(Task $task): JsonResource
     {
         $task->load('children');
@@ -27,7 +27,7 @@ class TaskController extends Controller
         return new TaskResource($task);
     }
 
-    // POST /tasks - 新しいタスクの作成
+    /** 新規タスク作成 */
     public function store(Request $request): JsonResource
     {
         $validated = $request->validate([
@@ -43,7 +43,7 @@ class TaskController extends Controller
         return new TaskResource($task);
     }
 
-    // PUT /tasks/{task} - タスクの更新
+    /** タスク更新 */
     public function update(Request $request, Task $task): JsonResource
     {
         $validated = $request->validate([
@@ -59,7 +59,7 @@ class TaskController extends Controller
         return new TaskResource($task); // 更新されたタスクをTaskResourceで返す
     }
 
-    // DELETE /tasks/{task} - タスクの削除
+    /** タスク削除 */
     public function destroy(Task $task): JsonResponse
     {
         $task->delete();
