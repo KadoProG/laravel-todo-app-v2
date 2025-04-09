@@ -12,6 +12,7 @@
         "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {
+        "dedoc/scramble": "^0.12.17",
         "fakerphp/faker": "^1.23",
         "laravel/breeze": "^2.2",
         "laravel/pint": "^1.13",
