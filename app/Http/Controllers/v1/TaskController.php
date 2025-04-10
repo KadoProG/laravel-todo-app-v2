@@ -16,8 +16,7 @@ class TaskController extends Controller
     {
         $tasks = Task::with(['createdUser', 'assignedUsers'])->get();
 
-        // return TaskResource::collection($tasks);
-        return response()->json($tasks);
+        return response()->json(['tasks' => TaskResource::collection($tasks)]);
     }
 
     /** タスク単体取得 */
