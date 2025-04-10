@@ -44,7 +44,7 @@ class Task extends Model
 
     public function createdUser()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_user_id');
     }
 
     public function assignedUsers()
