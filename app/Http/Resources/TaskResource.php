@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TaskResource extends JsonResource
 {
+    public static $wrap = 'task';
+
     /**
      * Transform the resource into an array.
      *

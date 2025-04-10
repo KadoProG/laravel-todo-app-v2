@@ -22,7 +22,7 @@ class TaskController extends Controller
     /** タスク単体取得 */
     public function show(Task $task): JsonResource
     {
-        $task->load('children');
+        $task->load(['createdUser', 'assignedUsers']);
 
         return new TaskResource($task);
     }
