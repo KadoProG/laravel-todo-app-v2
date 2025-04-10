@@ -18,9 +18,13 @@ class TaskResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'created_user' => $this->createdUser,
-            'assigned_users' => $this->assignedUsers,
+            'is_public' => $this->is_public,
             'is_done' => $this->is_done,
+            'created_user_id' => $this->created_user_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'created_user' => new UserResource($this->createdUser),
+            'assigned_users' => UserResource::collection($this->assignedUsers),
         ];
     }
 }
