@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->boolean('is_public');
             $table->boolean('is_done');
+            $table->dateTime('expired_at')->nullable();
             $table->unsignedBigInteger('created_user_id');
             $table->foreign('created_user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

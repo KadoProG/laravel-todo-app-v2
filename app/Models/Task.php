@@ -20,6 +20,7 @@ class Task extends Model
         'description',
         'is_public',
         'is_done',
+        'expired_at',
         'created_user_id',
     ];
 
