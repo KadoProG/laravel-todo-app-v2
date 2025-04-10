@@ -14,7 +14,7 @@ class UserController extends Controller
     {
         $users = User::all();
 
-        return response()->json(UserResource::collection($users));
+        return response()->json(['users' => UserResource::collection($users)]);
     }
 
     /** 自身のユーザ取得 */
