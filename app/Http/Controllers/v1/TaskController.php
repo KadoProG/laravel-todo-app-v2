@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskResource;
@@ -12,11 +12,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class TaskController extends Controller
 {
     /** タスク一覧取得 */
-    public function index(): JsonResource
+    public function index()
     {
-        $tasks = Task::with('children')->whereNull('parent_id')->get();
+        $tasks = Task::with(['createdUser', 'assignedUsers'])->get();
 
-        return TaskResource::collection($tasks);
+        // return TaskResource::collection($tasks);
+        return response()->json($tasks);
     }
 
     /** タスク単体取得 */
@@ -32,11 +33,15 @@ class TaskController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'is_public' => 'required|boolean',
             'description' => 'nullable|string',
-            'parentId' => 'sometimes|integer|exists:tasks,id',
+            'assigned_user_ids' => 'nullable|array',
+            'assigned_user_ids.*' => 'required|integer|exists:users,id',
         ]);
 
-        $validated['parent_id'] = $validated['parentId'] ?? null;
+        $user = $request->user();
+
+        $validated['created_user_id'] = $user->id;
 
         $task = Task::create($validated);
 
@@ -48,11 +53,12 @@ class TaskController extends Controller
     {
         $validated = $request->validate([
             'title' => 'string|max:255',
+            'is_public' => 'sometimes|boolean',
             'description' => 'nullable|string',
-            'isDone' => 'sometimes|boolean',
+            'is_done' => 'sometimes|boolean',
+            'assigned_user_ids' => 'nullable|array',
+            'assigned_user_ids.*' => 'required|integer|exists:users,id',
         ]);
-
-        $validated['is_done'] = $validated['isDone'] ?? $task->is_done;
 
         $task->update($validated);
 

@@ -17,16 +17,10 @@ class Task extends Model
     protected $fillable = [
         'title',
         'description',
+        'is_public',
         'is_done',
-        'parent_id',
+        'created_user_id',
     ];
-
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<string>
-     */
-    protected $appends = ['isDone', 'parentId'];
 
     /**
      * The attributes that should be cast.
@@ -35,7 +29,7 @@ class Task extends Model
      */
     protected $casts = [
         'is_done' => 'boolean',
-        'parent_id' => 'integer',
+        'is_public' => 'boolean',
     ];
 
     /**
@@ -45,29 +39,16 @@ class Task extends Model
      */
     protected $attributes = [
         'is_done' => false,
+        'is_public' => false,
     ];
 
-    // isDoneの値を保存するときにis_doneカラムに変換するミューテータ
-    public function setIsDoneAttribute($value)
+    public function createdUser()
     {
-        $this->attributes['is_done'] = $value;
+        return $this->belongsTo(User::class);
     }
 
-    // parentIdの値を保存するときにparent_idカラムに変換するミューテータ
-    public function setParentIdAttribute($value)
+    public function assignedUsers()
     {
-        $this->attributes['parent_id'] = $value;
-    }
-
-    // 子Taskを取得するリレーション
-    public function children()
-    {
-        return $this->hasMany(Task::class, 'parent_id');
-    }
-
-    // 親Taskを取得するリレーション
-    public function parent()
-    {
-        return $this->belongsTo(Task::class, 'parent_id');
+        return $this->belongsToMany(User::class, 'task_assigned_users', 'task_id', 'user_id')->withTimestamps();
     }
 }

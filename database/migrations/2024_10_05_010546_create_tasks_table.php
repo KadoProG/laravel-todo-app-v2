@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->boolean('is_public');
             $table->boolean('is_done');
-            $table->unsignedBigInteger('parent_id')->nullable();
-            $table->foreign('parent_id')->references('id')->on('tasks')->onDelete('cascade');
+            $table->unsignedBigInteger('created_user_id');
+            $table->foreign('created_user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
