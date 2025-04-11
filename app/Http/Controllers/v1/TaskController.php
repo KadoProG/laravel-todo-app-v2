@@ -34,6 +34,7 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'is_public' => 'required|boolean',
             'description' => 'nullable|string',
+            'expired_at' => 'nullable|date_format:Y-m-d H:i:s',
             'assigned_user_ids' => 'nullable|array',
             'assigned_user_ids.*' => 'required|integer|exists:users,id',
         ]);
@@ -51,8 +52,9 @@ class TaskController extends Controller
     public function update(Request $request, Task $task): JsonResource
     {
         $validated = $request->validate([
-            'title' => 'string|max:255',
+            'title' => 'sometimes|string|max:255',
             'is_public' => 'sometimes|boolean',
+            'expired_at' => 'nullable|date_format:Y-m-d H:i:s',
             'description' => 'nullable|string',
             'is_done' => 'sometimes|boolean',
             'assigned_user_ids' => 'nullable|array',
