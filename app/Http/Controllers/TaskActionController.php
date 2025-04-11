@@ -50,6 +50,7 @@ class TaskActionController extends Controller
     public function destroy(Request $request, Task $task, TaskAction $action): JsonResponse
     {
         $action->delete();
+
         return response()->json(null, 204);
     }
 }
