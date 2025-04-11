@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskActionRequest;
+use App\Http\Requests\UpdateTaskActionRequest;
 use App\Http\Resources\TaskActionResource;
 use App\Models\Task;
 use App\Models\TaskAction;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TaskActionController extends Controller
@@ -19,28 +20,18 @@ class TaskActionController extends Controller
     }
 
     /** タスクに対応するアクション作成 */
-    public function store(Request $request, Task $task)
+    public function store(StoreTaskActionRequest $request, Task $task)
     {
-        // TODO パーミッションを追加する
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'is_done' => 'sometimes|boolean',
-        ]);
-
+        $validated = $request->validated();
         $action = $task->actions()->create($validated);
 
         return new TaskActionResource($action);
     }
 
     /** タスクに対応するアクション更新 */
-    public function update(Request $request, Task $task, TaskAction $action)
+    public function update(UpdateTaskActionRequest $request, Task $task, TaskAction $action)
     {
-        // TODO パーミッションを追加する
-        $validated = $request->validate([
-            'name' => 'sometimes|string',
-            'is_done' => 'sometimes|boolean',
-        ]);
-
+        $validated = $request->validated();
         $action->update($validated);
 
         return new TaskActionResource($action);
