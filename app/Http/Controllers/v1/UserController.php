@@ -22,4 +22,9 @@ class UserController extends Controller
     {
         return new UserResource($request->user());
     }
+
+    public function update(Request $request)
+    {
+        
+    }
 }
