@@ -32,6 +32,7 @@ class Task extends Model
     protected $casts = [
         'is_done' => 'boolean',
         'is_public' => 'boolean',
+        'expired_at' => 'datetime',
     ];
 
     /**

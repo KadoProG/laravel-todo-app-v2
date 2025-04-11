@@ -34,7 +34,7 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'is_public' => 'required|boolean',
             'description' => 'nullable|string',
-            'expired_at' => 'nullable|date_format:Y-m-d H:i:s',
+            'expired_at' => 'nullable|date',
             'assigned_user_ids' => 'nullable|array',
             'assigned_user_ids.*' => 'required|integer|exists:users,id',
         ]);
@@ -54,7 +54,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'is_public' => 'sometimes|boolean',
-            'expired_at' => 'nullable|date_format:Y-m-d H:i:s',
+            'expired_at' => 'nullable|date',
             'description' => 'nullable|string',
             'is_done' => 'sometimes|boolean',
             'assigned_user_ids' => 'nullable|array',
