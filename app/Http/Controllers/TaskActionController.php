@@ -33,7 +33,7 @@ class TaskActionController extends Controller
     }
 
     /** タスクに対応するアクション更新 */
-    public function update(Request $request, Task $task, TaskAction $taskAction)
+    public function update(Request $request, Task $task, TaskAction $action)
     {
         // TODO パーミッションを追加する
         $validated = $request->validate([
@@ -41,16 +41,15 @@ class TaskActionController extends Controller
             'is_done' => 'sometimes|boolean',
         ]);
 
-        $taskAction->update($validated);
+        $action->update($validated);
 
-        return new TaskActionResource($taskAction);
+        return new TaskActionResource($action);
     }
 
     /** タスクに対応するアクション削除 */
-    public function destroy(Request $request, Task $task, TaskAction $taskAction): JsonResponse
+    public function destroy(Request $request, Task $task, TaskAction $action): JsonResponse
     {
-        $taskAction->delete();
-
+        $action->delete();
         return response()->json(null, 204);
     }
 }
