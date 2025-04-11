@@ -12,7 +12,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    // ユーザー登録
+    /** ユーザー登録 */
     public function register(Request $request)
     {
         $request->validate([
@@ -32,7 +32,7 @@ class AuthController extends Controller
         return response()->json(compact('user', 'token'), 201);
     }
 
-    // ログイン
+    /** ログイン */
     public function login(LoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
@@ -44,7 +44,7 @@ class AuthController extends Controller
         return response()->json(compact('token'));
     }
 
-    // ログアウト
+    /** ログアウト */
     public function logout()
     {
         Auth::guard('api')->logout();
@@ -52,16 +52,17 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    // ログインしているユーザー情報の取得
+    /** ログインしているユーザー情報の取得 */
     public function me()
     {
         return response()->json(Auth::guard('api')->user());
     }
 
+    /** トークンのリフレッシュ */
     public function refresh()
     {
         try {
-            // トークンをリフレッシュ
+            /** トークンをリフレッシュ */
             $token = JWTAuth::getToken();
 
             if (! $token) {

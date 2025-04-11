@@ -47,10 +47,10 @@ class TaskActionController extends Controller
     }
 
     /** タスクに対応するアクション削除 */
-    public function destroy(Request $request, Task $task, TaskAction $action): JsonResponse
+    public function destroy(Request $request, Task $task, TaskAction $action)
     {
         $action->delete();
 
-        return response()->json(null, 204);
+        return response()->noContent();
     }
 }

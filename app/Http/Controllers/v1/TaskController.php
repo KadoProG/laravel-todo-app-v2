@@ -67,10 +67,10 @@ class TaskController extends Controller
     }
 
     /** タスク削除 */
-    public function destroy(Task $task): JsonResponse
+    public function destroy(Task $task)
     {
         $task->delete();
 
-        return response()->json(null, 204);
+        return response()->noContent();
     }
 }
