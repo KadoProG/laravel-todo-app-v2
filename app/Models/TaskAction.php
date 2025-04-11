@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Task extends Model
+class TaskAction extends Model
 {
-    use HasFactory,  SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -16,12 +16,9 @@ class Task extends Model
      * @var array<string>
      */
     protected $fillable = [
-        'title',
-        'description',
-        'is_public',
+        'task_id',
+        'name',
         'is_done',
-        'expired_at',
-        'created_user_id',
     ];
 
     /**
@@ -31,7 +28,6 @@ class Task extends Model
      */
     protected $casts = [
         'is_done' => 'boolean',
-        'is_public' => 'boolean',
     ];
 
     /**
@@ -41,21 +37,10 @@ class Task extends Model
      */
     protected $attributes = [
         'is_done' => false,
-        'is_public' => false,
     ];
 
-    public function createdUser()
+    public function task()
     {
-        return $this->belongsTo(User::class, 'created_user_id');
-    }
-
-    public function assignedUsers()
-    {
-        return $this->belongsToMany(User::class, 'task_assigned_users', 'task_id', 'user_id')->withTimestamps();
-    }
-
-    public function actions()
-    {
-        return $this->hasMany(TaskAction::class);
+        return $this->belongsTo(Task::class);
     }
 }

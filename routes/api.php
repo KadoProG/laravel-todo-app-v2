@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TaskActionController;
 use App\Http\Controllers\v1\TaskController;
 use App\Http\Controllers\v1\UserController;
 use App\Http\Controllers\v1\UserMeTaskController;
@@ -15,6 +16,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('users/me', [UserController::class, 'me']);
         Route::get('users', [UserController::class, 'index']);
         Route::apiResource('/tasks', TaskController::class);
+        Route::apiResource('tasks/{task}/actions', TaskActionController::class);
         Route::apiResource('users/me/tasks', UserMeTaskController::class)->only('index');
     });
 });
