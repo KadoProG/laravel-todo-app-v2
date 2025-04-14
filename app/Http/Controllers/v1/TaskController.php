@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TaskFilterRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -11,9 +12,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class TaskController extends Controller
 {
     /** タスク一覧取得 */
-    public function index()
+    public function index(TaskFilterRequest $request)
     {
-        $tasks = Task::with(['createdUser', 'assignedUsers'])->get();
+        $filters = $request->only(['is_public', 'is_done', 'expired_before', 'expired_after', 'created_user_id', 'created_user_ids', 'assigned_user_id', 'assigned_user_ids']);
+        $query = Task::with(['createdUser', 'assignedUsers'])->filter($filters);
+
+        if ($request->filled('sort_by')) {
+            $query->orderBy($request->input('sort_by'), $request->input('sort_order', 'desc'));
+        }
+
+        $tasks = $query->get();
 
         return response()->json(['tasks' => TaskResource::collection($tasks)]);
     }

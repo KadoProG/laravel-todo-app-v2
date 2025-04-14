@@ -3,23 +3,29 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TaskFilterRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
-use Illuminate\Http\Request;
 
 class UserMeTaskController extends Controller
 {
     /** 自身のタスク一覧取得 */
-    public function index(Request $request)
+    public function index(TaskFilterRequest $request)
     {
         $user = $request->user();
-        $tasksQuery = Task::with(['createdUser', 'assignedUsers'])
+        $filters = $request->only(['is_public', 'is_done', 'expired_before', 'expired_after', 'created_user_id', 'created_user_ids', 'assigned_user_id', 'assigned_user_ids']);
+
+        $query = Task::with(['createdUser', 'assignedUsers'])->filter($filters)
             ->where('created_user_id', $user->id)
             ->orWhereHas('assignedUsers', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
 
-        $tasks = $tasksQuery->get();
+        if ($request->filled('sort_by')) {
+            $query->orderBy($request->input('sort_by'), $request->input('sort_order', 'desc'));
+        }
+
+        $tasks = $query->get();
 
         return response()->json(['tasks' => TaskResource::collection($tasks)]);
     }
