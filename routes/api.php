@@ -14,8 +14,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::group(['middleware' => 'auth:api'], function () {
         Route::get('users/me', [UserController::class, 'me']);
-        Route::get('users', [UserController::class, 'index']);
-        Route::apiResource('/tasks', TaskController::class);
+        Route::apiResource('users', UserController::class)->only(['index', 'update', 'destroy']);
+        Route::apiResource('tasks', TaskController::class);
         Route::apiResource('tasks/{task}/actions', TaskActionController::class);
         Route::apiResource('users/me/tasks', UserMeTaskController::class)->only('index');
     });

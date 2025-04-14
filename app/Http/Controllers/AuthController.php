@@ -52,12 +52,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    /** ログインしているユーザー情報の取得 */
-    public function me()
-    {
-        return response()->json(Auth::guard('api')->user());
-    }
-
     /** トークンのリフレッシュ */
     public function refresh()
     {
