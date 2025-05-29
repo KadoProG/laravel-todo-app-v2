@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     git \
     curl
 
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY ./.docker/php/php.ini /usr/local/etc/php/
