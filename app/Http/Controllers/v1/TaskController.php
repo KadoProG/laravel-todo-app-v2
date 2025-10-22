@@ -14,7 +14,7 @@ class TaskController extends Controller
     /** タスク一覧取得 */
     public function index(TaskFilterRequest $request)
     {
-        $filters = $request->only(['is_public', 'is_done', 'expired_before', 'expired_after', 'created_user_id', 'created_user_ids', 'assigned_user_id', 'assigned_user_ids']);
+        $filters = $request->validatedFilters();
         $query = Task::with(['createdUser', 'assignedUsers'])->filter($filters);
 
         if ($request->filled('sort_by')) {
