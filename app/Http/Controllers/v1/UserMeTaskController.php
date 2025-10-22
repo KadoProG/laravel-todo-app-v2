@@ -13,7 +13,7 @@ class UserMeTaskController extends Controller
     public function index(TaskFilterRequest $request)
     {
         $user = $request->user();
-        $filters = $request->only(['is_public', 'is_done', 'expired_before', 'expired_after', 'created_user_id', 'created_user_ids', 'assigned_user_id', 'assigned_user_ids']);
+        $filters = $request->validatedFilters();
 
         $query = Task::with(['createdUser', 'assignedUsers'])->filter($filters)
             ->where('created_user_id', $user->id)

@@ -13,10 +13,10 @@ class TaskFilterRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->merge([
-            'is_public' => filter_var($this->is_public, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-            'is_done' => filter_var($this->is_done, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-        ]);
+        $this->merge(array_filter([
+            'is_public' => $this->has('is_public') ? filter_var($this->is_public, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : null,
+            'is_done' => $this->has('is_done') ? filter_var($this->is_done, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : null,
+        ], fn ($v) => ! is_null($v)));
     }
 
     public function rules(): array

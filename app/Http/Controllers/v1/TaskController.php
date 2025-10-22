@@ -8,6 +8,7 @@ use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
@@ -16,6 +17,7 @@ class TaskController extends Controller
     {
         $filters = $request->validatedFilters();
         $query = Task::with(['createdUser', 'assignedUsers'])->filter($filters);
+        Log::info($query->toSql(), $query->getBindings());
 
         if ($request->filled('sort_by')) {
             $query->orderBy($request->input('sort_by'), $request->input('sort_order', 'desc'));
