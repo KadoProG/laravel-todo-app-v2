@@ -4,6 +4,8 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TaskFilterRequest;
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -38,65 +40,36 @@ class TaskController extends Controller
     }
 
     /** 新規タスク作成 */
-    public function store(Request $request): JsonResource
+    public function store(StoreTaskRequest $request): JsonResource
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'is_public' => 'required|boolean',
-            'description' => 'nullable|string',
-            'expired_at' => 'nullable|date',
-            'assigned_user_ids' => 'nullable|array',
-            'assigned_user_ids.*' => 'required|integer|exists:users,id',
-        ]);
-
+        $validated = $request->validated();
         $user = $request->user();
-
         $validated['created_user_id'] = $user->id;
-
         $assignedUserIds = $validated['assigned_user_ids'] ?? null;
         unset($validated['assigned_user_ids']);
-
-        // DBトランザクションで安全にタスクとリレーションを保存
         $task = DB::transaction(function () use ($validated, $assignedUserIds) {
             $task = Task::create($validated);
             if (! is_null($assignedUserIds)) {
                 $task->assignedUsers()->sync($assignedUserIds);
             }
-
             return $task;
         });
-
         return new TaskResource($task);
     }
 
     /** タスク更新 */
-    public function update(Request $request, Task $task): JsonResource
+    public function update(UpdateTaskRequest $request, Task $task): JsonResource
     {
-        $validated = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'is_public' => 'sometimes|boolean',
-            'expired_at' => 'nullable|date',
-            'description' => 'nullable|string',
-            'is_done' => 'sometimes|boolean',
-            'assigned_user_ids' => 'nullable|array',
-            'assigned_user_ids.*' => 'required|integer|exists:users,id',
-        ]);
-
-        // assigned_user_idsはリレーション用なので切り離し
+        $validated = $request->validated();
         $assignedUserIds = $validated['assigned_user_ids'] ?? null;
         unset($validated['assigned_user_ids']);
-
-        // DBトランザクションで安全に更新
         DB::transaction(function () use ($task, $validated, $assignedUserIds) {
             $task->update($validated);
-
-            // assigned_user_idsが指定されていればリレーションを更新
             if (! is_null($assignedUserIds)) {
                 $task->assignedUsers()->sync($assignedUserIds);
             }
         });
-
-        return new TaskResource($task); // 更新されたタスクをTaskResourceで返す
+        return new TaskResource($task);
     }
 
     /** タスク削除 */
