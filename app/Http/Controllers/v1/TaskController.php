@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\TaskFilterRequest;
 use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\TaskFilterRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -52,8 +51,10 @@ class TaskController extends Controller
             if (! is_null($assignedUserIds)) {
                 $task->assignedUsers()->sync($assignedUserIds);
             }
+
             return $task;
         });
+
         return new TaskResource($task);
     }
 
@@ -69,6 +70,7 @@ class TaskController extends Controller
                 $task->assignedUsers()->sync($assignedUserIds);
             }
         });
+
         return new TaskResource($task);
     }
 
