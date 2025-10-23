@@ -26,6 +26,12 @@ php artisan migrate
 php artisan test tests/Feature/TaskApiTest.php
 ```
 
+### 開発時
+
+```shell
+npx lefthook install
+```
+
 ## 環境構築でやったこと（今後実行する必要はない）
 
 1. `curl -s "https://laravel.build/{ディレクトリ名}" | bash` で、新しいディレクトリが作成される
