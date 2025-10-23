@@ -22,14 +22,16 @@ class UserApiTest extends TestCase
         // トークンをAuthorizationヘッダーに設定してリクエスト
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$token,
-        ])->json('GET', '/api/v1/me');
+        ])->json('GET', '/api/v1/users/me');
 
         // レスポンスの検証
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'id',
-            'name',
-            'email', // 必要なフィールドを指定
+            'user' => [
+                'id',
+                'name',
+                'email',
+            ],
         ]);
     }
 
@@ -48,7 +50,7 @@ class UserApiTest extends TestCase
         // 新しいトークンで認証されたリクエストをテスト
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$newToken,
-        ])->json('GET', '/api/v1/me');
+        ])->json('GET', '/api/v1/users/me');
 
         $response->assertStatus(200);
     }
