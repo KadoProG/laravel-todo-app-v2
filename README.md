@@ -11,16 +11,12 @@ cp .env.example .env
 # docker-compose 経由で起動（以降はdockerデスクトップで起動可能）
 docker-compose up --build -d
 
-# jwt認証に必要なキーを生成
-php artisan jwt:secret
 
 # 初期セットアップ（laravel.testコンテナ内で）
+# jwt認証に必要なキーを生成
+php artisan jwt:secret
 php key:generate
 php artisan migrate
-
-
-# コミット前にやること
-yarn # install package（huskyがインストールされる）
 ```
 
 ### テストコードの実行

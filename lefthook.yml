@@ -1,0 +1,11 @@
+pre-commit:
+  parallel: true
+  commands:
+    pint:
+      run: docker-compose exec laravel.test ./vendor/bin/pint --test
+
+pre-push:
+  parallel: true
+  commands:
+    test:
+      run: docker-compose exec laravel.test php artisan test
