@@ -192,7 +192,7 @@ class TaskApiTest extends TestCase
     public function test_is_public_is_required_when_creating_task()
     {
         $data = [
-            'title' => 'title only'
+            'title' => 'title only',
         ];
         $response = $this->postJson('/api/v1/tasks', $data);
         $response->assertStatus(422)->assertJsonValidationErrors('is_public');
