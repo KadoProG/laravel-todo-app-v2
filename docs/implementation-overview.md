@@ -42,6 +42,58 @@ Laravel ベースの TODO アプリケーション API。JWT 認証を使用し�
     -   `is_done`: 完了フラグ
 -   SoftDeletes 対応
 
+## ER 図
+
+```mermaid
+erDiagram
+    users ||--o{ tasks : creates
+    users ||--o{ task_assigned_users : assigned
+    tasks ||--o{ task_assigned_users : assigned_to
+    tasks ||--o{ task_actions : has
+
+    users {
+        bigint id PK
+        string name
+        string email UK
+        string password
+        timestamp email_verified_at
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+    }
+
+    tasks {
+        bigint id PK
+        string title
+        text description
+        boolean is_public
+        boolean is_done
+        datetime expired_at
+        bigint created_user_id FK
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+    }
+
+    task_assigned_users {
+        bigint id PK
+        bigint task_id FK
+        bigint user_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    task_actions {
+        bigint id PK
+        bigint task_id FK
+        string name
+        boolean is_done
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+    }
+```
+
 ## API エンドポイント
 
 ### 認証 (`/api/v1`)
