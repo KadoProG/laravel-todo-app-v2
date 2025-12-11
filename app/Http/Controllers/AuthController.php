@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\LoginCollection;
+use App\Http\Resources\RegisterResource;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +16,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class AuthController extends Controller
 {
     /** ユーザー登録 */
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -30,7 +32,7 @@ class AuthController extends Controller
 
         $token = JWTAuth::fromUser($user);
 
-        return response()->json(compact('user', 'token'), 201);
+        return (new RegisterResource($user, $token))->response()->setStatusCode(201);
     }
 
     /** ログイン */
