@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
 
+RUN pecl install pcov \
+    && docker-php-ext-enable pcov
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY ./.docker/php/php.ini /usr/local/etc/php/
 
