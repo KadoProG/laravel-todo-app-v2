@@ -14,10 +14,10 @@ class UpdateTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'sometimes|string|max:255',
+            'title' => 'sometimes|string|max:50',
             'is_public' => 'sometimes|boolean',
             'expired_at' => 'nullable|date',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:300',
             'is_done' => 'sometimes|boolean',
             'assigned_user_ids' => 'nullable|array',
             'assigned_user_ids.*' => 'required|integer|exists:users,id',
