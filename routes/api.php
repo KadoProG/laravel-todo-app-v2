@@ -16,7 +16,10 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('users/me', [UserController::class, 'me']);
         Route::apiResource('users', UserController::class)->only(['index', 'update', 'destroy']);
         Route::apiResource('tasks', TaskController::class);
-        Route::apiResource('tasks/{task}/actions', TaskActionController::class);
-        Route::apiResource('users/me/tasks', UserMeTaskController::class)->only('index');
+        Route::apiResource('tasks/{task}/actions', TaskActionController::class)
+            ->names('tasks.actions');
+        Route::apiResource('users/me/tasks', UserMeTaskController::class)
+            ->only('index')
+            ->names('users.me.tasks');
     });
 });
