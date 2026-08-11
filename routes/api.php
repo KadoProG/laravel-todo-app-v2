@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskActionController;
+use App\Http\Controllers\v1\NotificationController;
 use App\Http\Controllers\v1\TaskController;
 use App\Http\Controllers\v1\UserController;
 use App\Http\Controllers\v1\UserMeTaskController;
@@ -21,5 +22,9 @@ Route::group(['prefix' => 'v1'], function () {
         Route::apiResource('users/me/tasks', UserMeTaskController::class)
             ->only('index')
             ->names('users.me.tasks');
+        Route::get('notifications', [NotificationController::class, 'index']);
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
     });
 });
