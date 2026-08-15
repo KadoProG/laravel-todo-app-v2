@@ -17,12 +17,12 @@ RUN pecl install pcov \
     && docker-php-ext-enable pcov
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-COPY ./.docker/php/php.ini /usr/local/etc/php/
+COPY ./.docker/local/php.ini /usr/local/etc/php/
 
 # docker-composeでマウントしているため不要
 # COPY . /var/www
 
-COPY ./.docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./.docker/local/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 

@@ -2,7 +2,7 @@ services:
     laravel.test:
         build:
             context: .
-            dockerfile: .docker/php/Dockerfile
+            dockerfile: .docker/local/Dockerfile
         platform: linux/arm64/v8
         volumes:
             - ".:/var/www/html:cached"
