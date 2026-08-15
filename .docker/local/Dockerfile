@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
     git \
     curl
 
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
+# opcache は PHP 8.5 のイメージに同梱済みのため install 対象に含めない
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 RUN pecl install pcov \
     && docker-php-ext-enable pcov
