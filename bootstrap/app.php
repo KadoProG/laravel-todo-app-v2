@@ -13,8 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // ALB / CloudFront の背後で動くため、X-Forwarded-* を信頼して
-        // 元のスキーマ（https）とホストを復元する
+        // ALB の背後で動くため、X-Forwarded-For からクライアントの IP を復元する。
+        // LoginRequest がログイン試行のレート制限キーに IP を使っており、
+        // 信頼しないと全員が ALB の同一 IP に集約されて制限が誤爆する。
+        //
+        // 絶対 URL の組み立てには使わない。AppServiceProvider で APP_URL に固定している。
         $middleware->trustProxies(at: '*');
 
         $middleware->alias([

@@ -91,6 +91,31 @@ class UserApiTest extends TestCase
         );
     }
 
+    public function test_icon_url_is_built_from_app_url_regardless_of_proxy_headers()
+    {
+        Storage::fake(config('filesystems.icons'));
+        $user = User::factory()->create();
+
+        // 本番は CloudFront → ALB → nginx と経由するため、リクエストから見える
+        // ホスト・プロトコル・ポートは実際の公開 URL と一致しない。
+        // 絶対 URL は APP_URL だけで決まり、これらに影響されない
+        $response = $this->withToken(JWTAuth::fromUser($user))
+            ->withHeaders([
+                'X-Forwarded-Proto' => 'https',
+                'X-Forwarded-Port' => '80',
+                'X-Forwarded-Host' => 'alb.internal.example.com',
+            ])
+            ->json('POST', "/api/v1/users/{$user->id}/icon", [
+                'icon' => UploadedFile::fake()->image('icon.png'),
+            ]);
+
+        $response->assertStatus(200);
+        $this->assertStringStartsWith(
+            rtrim(config('app.url'), '/').'/api/v1/users/',
+            $response->json('user.icon_url'),
+        );
+    }
+
     public function test_upload_icon_replaces_the_old_file()
     {
         $disk = Storage::fake(config('filesystems.icons'));
