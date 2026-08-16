@@ -14,7 +14,7 @@ class TaskApiTest extends TestCase
 
     protected $user;
 
-    public function setup(): void
+    protected function setup(): void
     {
         parent::setUp();
 
