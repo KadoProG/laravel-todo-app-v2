@@ -1,11 +1,18 @@
+# コンテナの起動状態に左右されないよう、ホストの vendor/bin と php を直接使う。
+# Pint も PHPUnit も PHP のバージョン差で結果が変わるものではなく、
+# 最終的な判定は CI（PHP 8.5）が行う。
 pre-commit:
   parallel: true
   commands:
     pint:
-      run: docker-compose exec laravel.test ./vendor/bin/pint --test
+      glob: "*.php"
+      # ステージ済みのファイルだけを整形し、直した結果をそのままコミットに含める。
+      # --test で落とすとコミットのたびに手で直すことになるため、自動修正にする
+      run: ./vendor/bin/pint {staged_files}
+      stage_fixed: true
 
 pre-push:
   parallel: true
   commands:
     test:
-      run: docker-compose exec laravel.test php artisan test
+      run: php artisan test

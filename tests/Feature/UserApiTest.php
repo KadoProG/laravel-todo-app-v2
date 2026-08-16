@@ -11,7 +11,7 @@ class UserApiTest extends TestCase
 {
     use RefreshDatabase; // データベースのリフレッシュ
 
-    public function testAuthenticatedRequest()
+    public function test_authenticated_request()
     {
         // テストユーザーの作成
         $user = User::factory()->create();
@@ -35,7 +35,7 @@ class UserApiTest extends TestCase
         ]);
     }
 
-    public function testTokenRefresh()
+    public function test_token_refresh()
     {
         $user = User::factory()->create();
         $token = JWTAuth::fromUser($user);
