@@ -35,7 +35,9 @@ updates:
 
   # Dockerfile のベースイメージ更新
   - package-ecosystem: "docker"
-    directory: "/.docker/local"
+    directories:
+      - "/.docker/local"
+      - "/.docker/production"
     schedule:
       interval: "weekly"
       day: "monday"
