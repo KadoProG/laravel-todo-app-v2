@@ -118,8 +118,66 @@ ALB 自体は HTTP のみで、証明書を持たない。ブラウザからは
 `FRONTEND_URL` は CORS 設定のために残してあるが、直接 ALB を叩くとき以外は経由しない。
 
 `bootstrap/app.php` で `trustProxies(at: '*')` を設定しており、
-CloudFront と ALB が付ける `X-Forwarded-Proto` を信頼して https として扱う。
+プロキシが付ける `X-Forwarded-*` を信頼して元のスキーマとホストを復元する。
 これが無いと Laravel が生成する URL が http になる。
+
+ただし ALB 自身は HTTP で受けているため、`X-Forwarded-Proto` に `http` を入れてしまう。
+ビューアとの実際のプロトコルは CloudFront が付ける `CloudFront-Forwarded-Proto` にあるので、
+`.docker/production/nginx.conf` の `map` でそちらを優先させている。
 
 独自ドメインを使う場合は ACM 証明書を発行して CloudFront に紐付ける。
 ALB 側は VPC 内の通信なので HTTP のままでよい。
+
+## 停止と削除
+
+このスタックには常時課金されるリソースが含まれる。東京リージョンでの概算は次のとおり。
+
+| リソース | 月額の目安 |
+| --- | --- |
+| NAT Gateway | 約 $45 |
+| ALB | 約 $25 |
+| RDS db.t4g.micro | 約 $20 |
+| ECS Fargate (0.5vCPU/1GB × 1) | 約 $20 |
+| 合計 | **$110 前後** |
+
+NAT Gateway と ALB は無料枠が無く、起動しているだけで課金される。
+
+### 完全に削除する
+
+使い終わったらこれで全て消す。学習用途ではこれが基本。
+
+```bash
+cd terraform
+terraform destroy
+```
+
+`skip_final_snapshot = true` のため RDS のデータは残らない。
+必要なら事前に dump を取る。
+
+再開したいときは `terraform apply` で作り直し、main に push すれば元の状態に戻る。
+tfstate 用の S3 バケットは destroy の対象外なので、そのまま再利用できる。
+
+destroy 後に main へ push すると、参照先が無いため `Deploy` ワークフローは失敗する。
+動作上の実害は無いが、通知が不要なら `.github/workflows/deploy.yml` の
+`push` トリガーを一時的に外す。
+
+### コンテナだけ止める
+
+インフラを残したままタスクだけ落とす場合。
+
+```bash
+aws ecs update-service \
+  --cluster laravel-todo-v2-prod \
+  --service laravel-todo-v2-prod \
+  --desired-count 0
+```
+
+止まるのは Fargate の分だけで、NAT・ALB・RDS の課金は続く（月 $90 前後）。
+節約目的ではあまり効果が無い。
+
+再開は `--desired-count 1` を指定する。
+`terraform.tfvars` の `desired_count` を変えても反映されない点に注意する。
+`terraform/ecs.tf` の `lifecycle` で `ignore_changes` に指定しているため。
+
+なお `Deploy` ワークフローは `--desired-count` を渡さないので、
+0 にした状態で main に push してもタスクは起動しない。
