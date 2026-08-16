@@ -56,6 +56,7 @@ erDiagram
         string name
         string email UK
         string password
+        string icon_path
         timestamp email_verified_at
         timestamp created_at
         timestamp updated_at
@@ -109,6 +110,9 @@ erDiagram
 -   `GET /` - ユーザー一覧
 -   `PUT /{id}` - ユーザー更新
 -   `DELETE /{id}` - ユーザー削除
+-   `POST /{id}/icon` - アイコンのアップロード（multipart）
+-   `DELETE /{id}/icon` - アイコンの削除
+-   `GET /{id}/icon` - アイコンの配信（認証不要）
 
 ### タスク (`/api/v1/tasks`)
 
