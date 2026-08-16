@@ -28,8 +28,22 @@ php artisan test tests/Feature/TaskApiTest.php
 
 ### 開発時
 
+Git フックを有効にする。
+
 ```shell
 npx lefthook install
+```
+
+`pre-commit` でステージ済みの PHP ファイルを Pint が整形し、直した結果をそのままコミットに含める。
+`pre-push` でテストを実行する。いずれもコンテナではなくホストの `php` / `vendor/bin` を使うため、
+`composer install` 済みであること。
+
+フックを入れていなくても、整形漏れは `Lint` ワークフローが PR で検出する。
+手元で確認・修正するときは次のとおり。
+
+```shell
+./vendor/bin/pint --test   # 確認のみ
+./vendor/bin/pint          # 修正する
 ```
 
 ### API ドキュメント
