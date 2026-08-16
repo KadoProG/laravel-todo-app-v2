@@ -99,6 +99,21 @@ Terraform が作るタスク定義は ECR に `latest` タグが無い状態を�
 `SESSION_DRIVER` と `CACHE_STORE` にデータベースドライバを使っていないのは、
 マイグレーション未適用の状態でもコンテナが起動できるようにするため。
 
+## アップロードファイル
+
+Fargate のファイルシステムは揮発性で、デプロイやタスク再起動のたびに消える。
+そのためユーザーアイコンなどのアップロードファイルは S3 バケット
+（`terraform output uploads_bucket_name`）に置く。`FILESYSTEM_DISK=s3` で切り替わり、
+認証情報は環境変数ではなく ECS のタスクロールから取る。
+
+バケットは非公開のままで、配信は `GET /api/v1/users/{user}/icon` が仲介する。
+`/api/*` は既に CloudFront から ALB に転送されているため、
+フロントエンド側の配信設定を変えずに済む。ただし `/api/*` は `CachingDisabled` なので
+CDN のキャッシュは効かず、毎回 ALB → PHP → S3 を経由する。
+
+`force_destroy = true` を付けているため、`terraform destroy` ではアップロード済みの
+ファイルごとバケットが消える。
+
 ## ログ
 
 CloudWatch Logs の `/ecs/laravel-todo-v2-prod` に集約される。

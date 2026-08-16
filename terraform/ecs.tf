@@ -38,6 +38,11 @@ locals {
     { name = "SESSION_DRIVER", value = "cookie" },
     { name = "CACHE_STORE", value = "file" },
     { name = "QUEUE_CONNECTION", value = "sync" },
+    # コンテナのファイルシステムは揮発性のため、アップロードは S3 に置く。
+    # 認証情報は環境変数ではなくタスクロールから取る
+    { name = "FILESYSTEM_DISK", value = "s3" },
+    { name = "AWS_BUCKET", value = aws_s3_bucket.uploads.bucket },
+    { name = "AWS_DEFAULT_REGION", value = var.aws_region },
   ]
 
   app_secrets = [

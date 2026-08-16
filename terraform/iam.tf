@@ -37,10 +37,27 @@ resource "aws_iam_role_policy" "ecs_execution_secrets" {
   policy = data.aws_iam_policy_document.ecs_execution_secrets.json
 }
 
-# アプリ本体が使うロール。現状 AWS API は叩かないため権限は空
+# アプリ本体が使うロール。アップロードバケットの読み書きに使う
 resource "aws_iam_role" "ecs_task" {
   name               = "${local.name}-ecs-task"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume.json
+}
+
+data "aws_iam_policy_document" "ecs_task_uploads" {
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+    resources = ["${aws_s3_bucket.uploads.arn}/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "ecs_task_uploads" {
+  name   = "uploads-bucket"
+  role   = aws_iam_role.ecs_task.id
+  policy = data.aws_iam_policy_document.ecs_task_uploads.json
 }
 
 # ---------- GitHub Actions の OIDC ----------

@@ -38,6 +38,11 @@ output "ecs_security_group_id" {
   value       = aws_security_group.ecs.id
 }
 
+output "uploads_bucket_name" {
+  description = "アップロードファイル（ユーザーアイコン）を置く S3 バケット"
+  value       = aws_s3_bucket.uploads.bucket
+}
+
 output "rds_endpoint" {
   description = "RDS のエンドポイント"
   value       = aws_db_instance.main.address
