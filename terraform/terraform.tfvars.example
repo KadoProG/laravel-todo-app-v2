@@ -1,0 +1,8 @@
+aws_region        = "ap-northeast-1"
+project           = "laravel-todo-v2"
+environment       = "prod"
+github_repository = "KadoProG/laravel-todo-app-v2"
+
+# 初回 apply の時点では CloudFront が未作成なので暫定値を入れ、
+# フロントエンドの構築後に正しい URL へ更新して再 apply する
+frontend_url = "http://localhost:5173"

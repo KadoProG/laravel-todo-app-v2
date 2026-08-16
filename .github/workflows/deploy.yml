@@ -1,0 +1,132 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ap-northeast-1
+  ECR_REPOSITORY: laravel-todo-v2-prod
+  ECS_CLUSTER: laravel-todo-v2-prod
+  ECS_SERVICE: laravel-todo-v2-prod
+  ECS_TASK_FAMILY: laravel-todo-v2-prod
+  CONTAINER_NAME: app
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image
+        id: image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: .docker/production/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Fetch current task definition
+        run: |
+          # describe の出力には register で受け付けられない読み取り専用項目が
+          # 含まれるため、あらかじめ取り除く
+          aws ecs describe-task-definition \
+            --task-definition "$ECS_TASK_FAMILY" \
+            --query 'taskDefinition' \
+            | jq 'del(
+                .taskDefinitionArn,
+                .revision,
+                .status,
+                .requiresAttributes,
+                .compatibilities,
+                .registeredAt,
+                .registeredBy
+              )' \
+            > task-definition.json
+
+      - name: Fill in the new image ID
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Register task definition
+        id: register
+        run: |
+          arn=$(aws ecs register-task-definition \
+            --cli-input-json "file://${{ steps.render.outputs.task-definition }}" \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "arn=$arn" >> "$GITHUB_OUTPUT"
+
+      # サービス更新の前にマイグレーションを流す。
+      # 複数タスクが同時に migrate を叩かないよう、単発タスクとして実行する。
+      - name: Run migrations
+        run: |
+          task_arn=$(aws ecs run-task \
+            --cluster "$ECS_CLUSTER" \
+            --task-definition "${{ steps.register.outputs.arn }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.AWS_SUBNET_IDS }}],securityGroups=[${{ secrets.AWS_SECURITY_GROUP_ID }}],assignPublicIp=DISABLED}" \
+            --overrides '{"containerOverrides":[{"name":"'"$CONTAINER_NAME"'","command":["php","artisan","migrate","--force"]}]}' \
+            --query 'tasks[0].taskArn' \
+            --output text)
+
+          echo "migration task: $task_arn"
+          aws ecs wait tasks-stopped --cluster "$ECS_CLUSTER" --tasks "$task_arn"
+
+          exit_code=$(aws ecs describe-tasks \
+            --cluster "$ECS_CLUSTER" \
+            --tasks "$task_arn" \
+            --query 'tasks[0].containers[0].exitCode' \
+            --output text)
+
+          echo "migration exit code: $exit_code"
+          if [ "$exit_code" != "0" ]; then
+            echo "::error::migration failed"
+            exit 1
+          fi
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster "$ECS_CLUSTER" \
+            --service "$ECS_SERVICE" \
+            --task-definition "${{ steps.register.outputs.arn }}" \
+            > /dev/null
+
+          aws ecs wait services-stable \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE"
