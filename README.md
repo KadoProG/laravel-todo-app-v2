@@ -32,24 +32,14 @@ php artisan test tests/Feature/TaskApiTest.php
 npx lefthook install
 ```
 
-### API ドキュメントの生成
+### API ドキュメント
 
-OpenAPI 仕様書（`docs/api.yml`）を YAML 形式で生成するには、以下のいずれかの方法を使用できます：
+`dedoc/scramble` がコードから生成する。起動中のアプリで参照できる。
 
-```shell
-# Dockerコンテナ内で実行（YAML形式で出力）
-docker-compose exec laravel.test php artisan scramble:export-yaml --path=docs/api.yml
-
-# または、Composerスクリプト経由（コンテナ内で実行）
-docker-compose exec laravel.test composer docs:export
-
-# JSON形式で出力する場合（デフォルト）
-docker-compose exec laravel.test php artisan scramble:export --path=api.json
-```
-
-**注意**: `scramble:export`コマンドは JSON 形式のみをサポートしています。YAML 形式で出力するには`scramble:export-yaml`コマンドを使用してください。
-
-生成された`api.yml`は、Swagger UI や ReDoc などのツールで視覚的に確認できます。
+| URL | 内容 |
+| --- | --- |
+| http://localhost:8080/docs/api | Stoplight Elements の UI |
+| http://localhost:8080/docs/api.json | OpenAPI 仕様（JSON） |
 
 設定は`config/scramble.php`でカスタマイズ可能です。
 
