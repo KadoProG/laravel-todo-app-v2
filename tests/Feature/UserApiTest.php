@@ -91,25 +91,29 @@ class UserApiTest extends TestCase
         );
     }
 
-    public function test_icon_url_omits_the_default_port_behind_a_https_proxy()
+    public function test_icon_url_is_built_from_app_url_regardless_of_proxy_headers()
     {
         Storage::fake(config('filesystems.icons'));
         $user = User::factory()->create();
 
-        // ALB は自身が HTTP で受けるためポート 80 を伝えてくる。nginx がプロトコルだけ
-        // https に直すので、ポートまで信頼すると URL に :80 が残り、
-        // ブラウザが 80 番へ TLS 接続して ERR_SSL_PROTOCOL_ERROR になる
+        // 本番は CloudFront → ALB → nginx と経由するため、リクエストから見える
+        // ホスト・プロトコル・ポートは実際の公開 URL と一致しない。
+        // 絶対 URL は APP_URL だけで決まり、これらに影響されない
         $response = $this->withToken(JWTAuth::fromUser($user))
             ->withHeaders([
                 'X-Forwarded-Proto' => 'https',
                 'X-Forwarded-Port' => '80',
+                'X-Forwarded-Host' => 'alb.internal.example.com',
             ])
             ->json('POST', "/api/v1/users/{$user->id}/icon", [
                 'icon' => UploadedFile::fake()->image('icon.png'),
             ]);
 
         $response->assertStatus(200);
-        $this->assertStringStartsWith('https://localhost/', $response->json('user.icon_url'));
+        $this->assertStringStartsWith(
+            rtrim(config('app.url'), '/').'/api/v1/users/',
+            $response->json('user.icon_url'),
+        );
     }
 
     public function test_upload_icon_replaces_the_old_file()

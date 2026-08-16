@@ -4,7 +4,6 @@ use App\Http\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,16 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // ALB / CloudFront の背後で動くため、X-Forwarded-* を信頼して
-        // 元のスキーマ（https）とホストを復元する。
+        // ALB の背後で動くため、X-Forwarded-For からクライアントの IP を復元する。
+        // LoginRequest がログイン試行のレート制限キーに IP を使っており、
+        // 信頼しないと全員が ALB の同一 IP に集約されて制限が誤爆する。
         //
-        // X-Forwarded-Port だけは信頼しない。ALB のリスナーポート（80）が入っており、
-        // nginx が https に直したプロトコルと食い違って絶対 URL に :80 が残るため。
-        // 信頼しなければ Host ヘッダから推定され、既定ポートとして省略される。
-        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_FOR
-            | Request::HEADER_X_FORWARDED_HOST
-            | Request::HEADER_X_FORWARDED_PROTO
-            | Request::HEADER_X_FORWARDED_PREFIX);
+        // 絶対 URL の組み立てには使わない。AppServiceProvider で APP_URL に固定している。
+        $middleware->trustProxies(at: '*');
 
         $middleware->alias([
             'verified' => EnsureEmailIsVerified::class,
