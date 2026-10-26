@@ -6688,16 +6688,16 @@
     "packages-dev": [
         {
             "name": "dedoc/scramble",
-            "version": "v0.13.48",
+            "version": "v0.13.49",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dedoc/scramble.git",
-                "reference": "511e0605642d6395deb22107559403551ff8d1b2"
+                "reference": "6c10396675a34c46a034b6ed3545485867cc836c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dedoc/scramble/zipball/511e0605642d6395deb22107559403551ff8d1b2",
-                "reference": "511e0605642d6395deb22107559403551ff8d1b2",
+                "url": "https://api.github.com/repos/dedoc/scramble/zipball/6c10396675a34c46a034b6ed3545485867cc836c",
+                "reference": "6c10396675a34c46a034b6ed3545485867cc836c",
                 "shasum": ""
             },
             "require": {
@@ -6757,7 +6757,7 @@
             ],
             "support": {
                 "issues": "https://github.com/dedoc/scramble/issues",
-                "source": "https://github.com/dedoc/scramble/tree/v0.13.48"
+                "source": "https://github.com/dedoc/scramble/tree/v0.13.49"
             },
             "funding": [
                 {
@@ -6765,7 +6765,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-15T05:35:23+00:00"
+            "time": "2026-10-18T10:48:30+00:00"
         },
         {
             "name": "fakerphp/faker",
