@@ -1,7 +1,7 @@
 # ---------- ステージ1: Composer 依存の解決 ----------
 # 実行イメージと同じ PHP バージョンの上で composer を動かし、
 # composer 公式イメージ側の PHP 差異で解決結果がぶれないようにする
-FROM php:8.5-cli-bookworm AS vendor
+FROM php:8.6-cli-bookworm AS vendor
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -31,7 +31,7 @@ COPY . .
 RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
 
 # ---------- ステージ2: 実行イメージ ----------
-FROM php:8.5-fpm-bookworm
+FROM php:8.6-fpm-bookworm
 
 # nginx と supervisor を1コンテナに同居させ、ECS のタスク定義を単純に保つ
 RUN apt-get update && apt-get install -y --no-install-recommends \
